@@ -1,0 +1,39 @@
+{% extends "base.html" %} {# Hereda de la base #}
+
+{% block title %}Detalle: {{ contact.nombre }} {{ contact.apellido }}{% endblock %} {# Título específico #}
+
+{% block content %}
+    <h2>Detalle del Contacto</h2>
+
+    <div class="contact-details">
+        <p><strong>Nombre:</strong> {{ contact.nombre }}</p>
+        <p><strong>Apellido:</strong> {{ contact.apellido }}</p>
+        <p><strong>Teléfono:</strong> {{ contact.telefono|default:"No especificado" }}</p>
+        <p><strong>Correo Electrónico:</strong> <a href="mailto:{{ contact.correo_electronico }}">{{ contact.correo_electronico }}</a></p>
+
+        <p><strong>Notas Adicionales:</strong></p>
+        {# Usamos <pre> para mantener el formato del texto (saltos de línea, etc.) #}
+        <pre>{{ contact.notas|default:"Sin notas adicionales."|linebreaksbr }}</pre> {# linebreaksbr convierte saltos de línea en <br> #}
+
+        <p><small>Contacto creado el: {{ contact.fecha_creacion|date:"d/m/Y H:i" }}</small></p>
+        <p><small>Última actualización: {{ contact.fecha_actualizacion|date:"d/m/Y H:i" }}</small></p>
+    </div>
+
+    <hr>
+
+    {# Acciones disponibles para este contacto #}
+    <div class="actions">
+        <a href="{% url 'contact_update' contact.pk %}" class="btn btn-primary">Editar Contacto</a>
+
+        {# Botón de eliminar con su formulario y confirmación #}
+        <form action="{% url 'contact_delete' contact.pk %}" method="post" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger"
+                    onclick="return confirm('¿Estás realmente seguro de que deseas eliminar a {{ contact.nombre }} {{ contact.apellido }}? Esta acción no se puede deshacer.');">
+                Eliminar Contacto
+            </button>
+        </form>
+
+        <a href="{% url 'contact_list' %}" class="btn btn-secondary" style="margin-left: 10px;">Volver a la Lista</a>
+    </div>
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends "base.html" %} {# Hereda de la base #}
+
+{% block title %}Confirmar Eliminación{% endblock %} {# Título específico #}
+
+{% block content %}
+    <h2>Confirmar Eliminación</h2>
+
+    <p>¿Estás completamente seguro de que deseas eliminar permanentemente al contacto:</p>
+    <p><strong>{{ contact.nombre }} {{ contact.apellido }}</strong> ({{ contact.correo_electronico }})?</p>
+    <p style="color: #dc3545; font-weight: bold;">¡Esta acción no se puede deshacer!</p>
+
+    {# Formulario que enviará la petición POST para confirmar la eliminación #}
+    <form method="post" action="{% url 'contact_delete' contact.pk %}">
+        {% csrf_token %} {# Token CSRF obligatorio #}
+        <button type="submit" class="btn btn-danger">Sí, Eliminar Definitivamente</button>
+        <a href="{% url 'contact_list' %}" class="btn btn-secondary" style="margin-left: 10px;">No, Cancelar y Volver</a>
+    </form>
+{% endblock %}

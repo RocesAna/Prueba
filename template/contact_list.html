@@ -1,0 +1,77 @@
+{% extends "base.html" %} {# Hereda de la plantilla base mejorada #}
+
+{% block title %}Lista de Contactos{% endblock %}
+
+{% block content %}
+    {# Título de la sección y botón de añadir alineados usando Flexbox #}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0"><i class="bi bi-list-task me-2"></i>Lista de Contactos</h2>
+        <a href="{% url 'contact_create' %}" class="btn btn-primary">
+            <i class="bi bi-plus-lg me-1"></i> Añadir Contacto
+        </a>
+    </div>
+
+    {# Mostrar mensajes flash de Django con estilo Bootstrap #}
+    {% if messages %}
+        {% for message in messages %}
+            {# Asigna clases de alerta de Bootstrap según las etiquetas del mensaje (success, error, warning, info) #}
+            <div class="alert alert-{% if message.tags %}{{ message.tags }}{% else %}info{% endif %} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    {% if contacts %}
+        {# Tabla responsiva: añade scroll horizontal en pantallas pequeñas si es necesario #}
+        <div class="table-responsive shadow-sm rounded">
+            <table class="table table-striped table-hover table-bordered mb-0"> {# Clases Bootstrap para estilo y borde #}
+                <thead class="table-dark"> {# Cabecera oscura para mejor contraste #}
+                    <tr>
+                        <th scope="col">Nombre</th>
+                        <th scope="col">Apellido</th>
+                        <th scope="col">Teléfono</th>
+                        <th scope="col">Email</th>
+                        <th scope="col" class="text-center">Acciones</th> {# Centrar texto en cabecera de acciones #}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for contact in contacts %}
+                        <tr>
+                            {# Enlace al detalle con estilo sutil #}
+                            <td><a href="{% url 'contact_detail' contact.pk %}" class="text-decoration-none">{{ contact.nombre }}</a></td>
+                            <td>{{ contact.apellido }}</td>
+                            <td>{{ contact.telefono|default:"<span class='text-muted'>--</span>"|safe }}</td> {# Usar clase text-muted para '--' #}
+                            <td>
+                                {# Enlace mailto para el correo #}
+                                <a href="mailto:{{ contact.correo_electronico }}" class="text-decoration-none">{{ contact.correo_electronico }}</a>
+                            </td>
+                            <td class="text-center align-middle"> {# Centrar acciones y alinear verticalmente #}
+                                {# Botón Editar con estilo outline #}
+                                <a href="{% url 'contact_update' contact.pk %}" class="btn btn-outline-primary btn-sm" title="Editar">
+                                    <i class="bi bi-pencil-fill"></i> <span class="d-none d-md-inline">Editar</span> {# Ocultar texto en pantallas pequeñas #}
+                                </a>
+
+                                {# Formulario para Eliminar con botón outline rojo #}
+                                <form action="{% url 'contact_delete' contact.pk %}" method="post" class="d-inline"> {# d-inline para que esté en la misma línea #}
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-outline-danger btn-sm" title="Eliminar"
+                                            onclick="return confirm('¿Estás realmente seguro de que deseas eliminar a {{ contact.nombre }} {{ contact.apellido }}? Esta acción no se puede deshacer.');">
+                                        <i class="bi bi-trash3-fill"></i> <span class="d-none d-md-inline">Eliminar</span> {# Ocultar texto en pantallas pequeñas #}
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div> {# Fin .table-responsive #}
+    {% else %}
+        {# Mensaje cuando no hay contactos, usando un componente Alert de Bootstrap #}
+        <div class="alert alert-secondary text-center" role="alert">
+            <i class="bi bi-info-circle me-2"></i>
+            Aún no hay contactos registrados. ¡Sé el primero en <a href="{% url 'contact_create' %}" class="alert-link">añadir uno</a>!
+        </div>
+    {% endif %}
+
+{% endblock %}

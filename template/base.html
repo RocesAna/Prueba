@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Gestor de Contactos{% endblock %} - Mi App</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <style>
+        /* Asegurar que el footer se quede abajo */
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background-color: #e9ecef; /* Fondo ligeramente más grisáceo para contraste */
+        }
+        main {
+            flex-grow: 1; /* El contenido principal ocupa el espacio */
+            padding-top: 1.5rem; /* Añadir espacio sobre el contenido principal */
+            padding-bottom: 3rem; /* Añadir espacio bajo el contenido principal */
+        }
+        /* Navbar personalizada */
+        .navbar {
+             /* Mantenemos la sombra para darle profundidad */
+            padding-top: 0.8rem; /* Ajuste fino del padding vertical */
+            padding-bottom: 0.8rem;
+        }
+        .navbar-brand {
+            font-weight: 500; /* Un poco menos grueso que 'bold' */
+            font-size: 1.3rem; /* Ligeramente más grande */
+        }
+        .navbar .nav-link {
+            padding: 0.5rem 1rem; /* Más padding en los enlaces */
+            transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+        }
+        .navbar-dark .navbar-nav .nav-link {
+             color: rgba(255, 255, 255, 0.8); /* Color base ligeramente atenuado */
+        }
+        .navbar-dark .navbar-nav .nav-link:hover,
+        .navbar-dark .navbar-nav .nav-link:focus {
+             color: rgba(255, 255, 255, 1); /* Blanco puro al pasar el mouse/focus */
+             background-color: rgba(255, 255, 255, 0.1); /* Fondo sutil al interactuar */
+        }
+        .navbar-dark .navbar-nav .nav-link.active {
+            color: #fff; /* Blanco para el enlace activo */
+            font-weight: 500;
+        }
+
+        /* Footer personalizado */
+        .footer {
+            background-color: #343a40; /* Un gris oscuro, similar a bg-dark */
+            color: rgba(255, 255, 255, 0.7); /* Texto blanco semi-transparente */
+            padding-top: 1.5rem;
+            padding-bottom: 1.5rem;
+        }
+        .footer a { /* Si añades enlaces al footer */
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+        }
+        .footer a:hover {
+            color: #fff;
+            text-decoration: underline;
+        }
+
+        /* Estilo opcional para resaltar la fila de la tabla al pasar el mouse */
+        .table-hover tbody tr:hover {
+           background-color: rgba(0, 0, 0, 0.05); /* Más sutil */
+        }
+        /* Ajuste botones en tablas */
+        td form .btn {
+            margin-left: 0.25rem;
+        }
+        /* Contenedor principal con sombra y bordes redondeados */
+        .content-container {
+             background-color: #fff;
+             padding: 2rem; /* Más padding interno */
+             border-radius: 0.5rem; /* Bordes más redondeados */
+             box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1); /* Sombra más pronunciada */
+             margin-bottom: 2rem; /* Espacio antes del footer */
+        }
+
+    </style>
+
+</head>
+<body class="d-flex flex-column min-vh-100">
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm"> {# Navbar oscura #}
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'contact_list' %}">
+                <i class="bi bi-journal-bookmark-fill me-2"></i> {# Icono diferente #}
+                Gestor Contactos
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        {# Añadimos lógica para marcar como 'active' la opción actual #}
+                        <a class="nav-link {% if request.resolver_match.url_name == 'contact_list' %}active{% endif %}"
+                           href="{% url 'contact_list' %}">
+                             <i class="bi bi-list-task me-1"></i>Ver Lista
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'contact_create' %}active{% endif %}"
+                           href="{% url 'contact_create' %}">
+                             <i class="bi bi-plus-square-dotted me-1"></i>Añadir
+                        </a>
+                    </li>
+                    {% if user.is_authenticated and user.is_staff %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'admin:index' %}" target="_blank" rel="noopener noreferrer">
+                                <i class="bi bi-sliders me-1"></i>Admin
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        {# Envuelve el bloque de contenido en un div con estilo para darle apariencia de "página" #}
+        <div class="content-container">
+            {% block content %}
+                {% endblock %}
+        </div>
+    </main>
+
+    <footer class="footer mt-auto"> {# Footer oscuro definido en CSS #}
+        <div class="container text-center">
+            <span> {# Ya no necesita text-muted, el color se define en .footer span o .footer directamente #}
+                &copy; {% now "Y" %} - Gestor de Contactos Profesionales |
+                <i class="bi bi-flag-fill text-danger"></i> Chile |
+                <i class="bi bi-clock-history"></i> {% now "d/m/Y H:i" %}
+            </span>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+    {% block scripts %}
+    {% endblock %}
+
+</body>
+</html>
